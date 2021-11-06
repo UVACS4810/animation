@@ -1,0 +1,57 @@
+pngs 180 120 hw4verts- 24
+fps 8
+div t f l
+
+# tetrahedron can be a cube with half the vertices at 2/3,2/3,2/3 instead of 2,2,2
+# we let x vary from -1 to 1, x2 from 0 to 1, x3 from 0 to 4/3, and x4 from 2/3 to 2
+
+mul angle t 180
+cos x angle
+pow x2 x 2
+mul x3 1.3333333333333 x2
+add x4 0.6666666666666 x3
+mul x5 -1 x4
+
+# Set a 3-by-2 aspect ratio, 90Â° field-of-view in Y, near plane at 0.1, far plane at 10
+loadp 0.6666666666666 0 0 0  0 1 0 0  0 0 -1.02020202020202 -0.20202020202020202  0 0 -1 0
+
+object box world
+quaternion 1 0 x 0
+position 0 0 -5
+xyz -2 -2 -2
+xyz -2  2  2
+xyz  2 -2  2
+xyz  2  2 -2
+
+xyz x5 x5 x4
+xyz x5 x4 x5
+xyz x4 x5 x5
+xyz x4 x4 x4
+
+color 1 0 0
+trif 1 3 5
+color 0 1 0
+trif 3 2 5
+color 0 0 1
+trif 2 1 5
+
+color 1 0.5 0.5
+trif 3 1 7
+color 1 0.5 1
+trif 1 4 7
+color 1 1 0.5
+trif 4 3 7
+
+color 0 0.5 0
+trif 2 3 8
+color 0.5 0.5 0
+trif 3 4 8
+color 0 0.5 0.5
+trif 4 2 8
+
+color 0.3 0.7 0.7
+trif 2 4 6
+color 0.7 0.3 0.7
+trif 4 1 6
+color 0.3 0.3 0.7
+trif 1 2 6

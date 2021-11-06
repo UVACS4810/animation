@@ -1,0 +1,37 @@
+pngs 120 120 hw4color- 36
+fps 18
+div t f l
+
+mul a1 t 360
+add a2 a1 120
+add a3 a1 240
+sin s1 a1
+sin s2 a2
+sin s3 a3
+add r1t s1 0.5
+add g1t s2 0.5
+add b1t s3 0.5
+mul r1 r1t 0.707
+mul g1 g1t 0.707
+mul b1 b1t 0.707
+
+add c1 s1 1
+add c2 s2 1
+add c3 s3 1
+div r2 c1 2
+div g2 c2 2
+div b2 c3 2
+
+# Set a 1-by-1 aspect ratio, 90Â° field-of-view in Y, near plane at 0.1, far plane at 10
+loadp 1 0 0 0  0 1 0 0  0 0 -1.02020202020202 -0.20202020202020202  0 0 -1 0
+
+object quad world
+position 0 0 -5
+xyz -3 -3 0
+xyz -3  3 0
+xyz  3 -3 0
+xyz  3  3 0
+color r1 g1 b1
+trif 1 2 3
+color r2 g2 b2
+trif 3 2 4

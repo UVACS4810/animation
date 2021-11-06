@@ -33,7 +33,12 @@ def get_image_info(line: str) -> utils.ImageInfo:
         image_info.number_of_images = int(line_as_list[-1])
 
     return image_info
-
+def is_number(s: str) -> bool:
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 def get_vert(verts, index: str) -> vertex.Vertex:
     if (index.strip("-")).isnumeric():
         index = int(index)
@@ -46,9 +51,8 @@ def get_vert(verts, index: str) -> vertex.Vertex:
     else:
         vert = verts[index - 1]
     return vert
-
 def var_val(var: str, variables: Variables) -> float:
-    if var.strip("-").isdecimal():
+    if is_number(var):
         return float(var)
     return variables.get_var(var)
 
@@ -57,12 +61,32 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
     parse keywords:
     """
     keyword: str = line[0]
+    ### IF ELSE FI ###
+    if keyword == "iflt":
+        x = var_val(line[1], variables)
+        y = var_val(line[2], variables)
+        if x < y:
+            draw_data.if_state = utils.IfState.TII
+        else:
+            draw_data.if_state = utils.IfState.FII
+    if keyword == "else":
+        if draw_data.if_state is utils.IfState.TII:
+            draw_data.if_state = utils.IfState.TIE
+        if draw_data.if_state is utils.IfState.FII:
+            draw_data.if_state = utils.IfState.FIE
+        
+    if keyword == "fi":
+        draw_data.if_state = utils.IfState.NOI
+    
+    if draw_data.if_state is utils.IfState.FII or draw_data.if_state is utils.IfState.TIE:
+        return
+        
     ### DRAW DATA UPDATES ###
     if keyword == "xyz":
         new_vertex: vertex.Vertex = vertex.Vertex(
-            x=float(line[1]),
-            y=float(line[2]),
-            z=float(line[3]),
+            x = var_val(line[1], variables),
+            y = var_val(line[2], variables),
+            z = var_val(line[3], variables),
             r=draw_data.color.r,
             g=draw_data.color.g,
             b=draw_data.color.b,
@@ -71,9 +95,9 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
         draw_data.vertex_list.append(new_vertex)
 
     elif keyword == "color":
-        r = float(line[1])
-        g = float(line[2])
-        b = float(line[3])
+        r = var_val(line[1], variables)
+        g = var_val(line[2], variables)
+        b = var_val(line[3], variables)
         draw_data.color = utils.RGBFloat(r, g, b)
 
     elif keyword == "loadp":
@@ -112,6 +136,21 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
         z = var_val(line[3], variables)
         position = utils.Vec3(x, y, z)
         objects[draw_data.curent_object].position = position
+    
+    elif keyword == "origin":
+        x = var_val(line[1], variables)
+        y = var_val(line[2], variables)
+        z = var_val(line[3], variables)
+        origin = utils.Vec3(x, y, z)
+        objects[draw_data.curent_object].origin = origin
+
+    elif keyword == "scale":
+        x = var_val(line[1], variables)
+        y = var_val(line[2], variables)
+        z = var_val(line[3], variables)
+        scale = utils.Vec3(x, y, z)
+        objects[draw_data.curent_object].scale = scale
+
     elif keyword == "quaternion":
         w = var_val(line[1], variables)
         x = var_val(line[2], variables)
@@ -120,8 +159,13 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
         quat = utils.Quaternion(w, x, y, z)
         objects[draw_data.curent_object].orient = quat
     
-
-
+    elif keyword == "euler":
+        xyz = line[1]
+        r1 = var_val(line[2], variables)
+        r2 = var_val(line[3], variables)
+        r3 = var_val(line[4], variables)
+        quat = utils.Euler(xyz, r1, r2, r3)
+        objects[draw_data.curent_object].orient = quat
 
     elif keyword == "add":
         dest, a, b = line[1:4]

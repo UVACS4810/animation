@@ -45,6 +45,7 @@ def main():
             # Whipe the data of variables and objects
             objects.clear()
             variables.new_frame()
+            draw_data.clear()
         assert(len(image_filenames) == len(images))
         # Save each of the files
         for i in range(len(image_filenames)):

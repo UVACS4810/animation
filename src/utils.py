@@ -1,6 +1,7 @@
 import dataclasses
 import math
 from typing import Any, Optional
+import enum
 
 from PIL import Image
 import numpy as np
@@ -55,6 +56,14 @@ class RGBFloat():
             return RGB(round(r), round(g), round(b), round(a))
         else:
             return RGB(r, g, b, a)
+
+class IfState(enum.Enum):
+    NOI = 1 # No if statement available
+    TII = 2 # True and in If statement
+    FII = 3 # False and in if statement
+    TIE = 4 # True and in else statement
+    FIE = 5 # False and in else statement
+
 @dataclasses.dataclass
 class SceneData():
     """contains information that will need to last for the lifecycle of the image
@@ -66,6 +75,7 @@ class SceneData():
     color: RGBFloat = RGBFloat(1.0, 1.0, 1.0)
     near = 0
     far = 1
+    if_state: IfState = IfState.NOI
     curent_object: Optional[str] = None
     depth_buffer: np.ndarray = dataclasses.field(init=False)
     def __post_init__(self):
@@ -75,9 +85,10 @@ class SceneData():
         """Used to wipe info that will not cary over to the next image in the animation
         """
         self.vertex_list.clear()
-        self.model_view = np.identity(4)
         self.projection = np.identity(4)
         self.color = RGBFloat(1.0, 1.0, 1.0)
+        self.depth_buffer = np.ones((self.height, self.width))
+        self.if_state = IfState.NOI
 
 def over_operator(ca: int, cb: int, aa: int, ab, a0: int) -> int:
     return round((ca * aa + cb*ab*(1-aa))/a0)
@@ -211,6 +222,15 @@ class Quaternion():
 
 @dataclasses.dataclass
 class Euler():
+    """an alternative representation of the orientation of an object.
+
+    \b `order` = The order of the rotations given by the xyz argument, which
+    will contain three letters (x, y, and z) in an arbitrary order 
+    (e.g. yxz or zxy or …)
+
+    \b `first`, `second`, `third` = rotate the object `x` degrees around the 
+    axis given by the corresponding letter in `order`
+    """
     # rotation matrix code from https://www.meccanismocomplesso.org/en/3d-rotations-and-euler-angles-in-python/
     order: str = "xyz"
     first: float = 0
@@ -231,18 +251,21 @@ class Euler():
                 rot = np.matmul(rot, self._rot_z(val))
         return rot
     def _rot_x(self,theta):
+        theta = math.radians(theta)
         return np.asarray([[ 1, 0              , 0              , 0],
                            [ 0, math.cos(theta),-math.sin(theta), 0],
                            [ 0, math.sin(theta), math.cos(theta), 0],
                            [ 0, 0              ,0               , 1]])
         
     def _rot_y(self,theta):
+        theta = math.radians(theta)
         return np.asarray([[ math.cos(theta), 0, math.sin(theta), 0],
                            [ 0              , 1, 0              , 0],
                            [-math.sin(theta), 0, math.cos(theta), 0],
                            [ 0              , 0, 0              , 1]])
         
     def _rot_z(self,theta):
+        theta = math.radians(theta)
         return np.asarray([[ math.cos(theta), -math.sin(theta), 0, 0 ],
                            [ math.sin(theta), math.cos(theta) , 0, 0 ],
                            [ 0              , 0               , 1, 0 ],

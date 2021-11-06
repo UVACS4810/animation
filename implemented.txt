@@ -1,0 +1,10 @@
+hw4parent.txt
+hw4drawing.txt
+hw4anim.txt
+hw4paranim.txt
+hw4origin.txt
+hw4scale.txt
+hw4euler1.txt
+hw4verts.txt
+hw4color.txt
+hw4iflt.txt

@@ -1,0 +1,31 @@
+pngs 180 120 hw4iflt- 36
+fps 12
+div t f 18
+sub s 2 t
+cos r f
+
+# Set a 3-by-2 aspect ratio, 90Â° field-of-view in Y, near plane at 0.1, far plane at 10
+loadp 0.6666666666666 0 0 0  0 1 0 0  0 0 -1.02020202020202 -0.20202020202020202  0 0 -1 0
+
+object tet world
+iflt f 18
+quaternion s 0 r t
+else
+quaternion t 0 r s
+fi
+position 0 0 -5
+xyz -2 -2 -2
+xyz -2  2  2
+xyz  2 -2  2
+xyz  2  2 -2
+iflt f 18
+color 1 0 0
+trif 1 2 3
+color 0 0.5 0
+trif 2 3 4
+else
+fi
+color 0.5 0 1
+trif 3 4 1
+color 1 1 0
+trif 4 1 2

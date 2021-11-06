@@ -272,6 +272,34 @@ class TestFileParse(unittest.TestCase):
             self.assertEqual(v.get_var("c"), exp)
             exp += 2
             v.new_frame()
+    
+    def test_var_val(self):
+        v = var.Variables(10)
+        v.add_var("a", 4)
+        val = file_parse.var_val("a", v)
+        self.assertEqual(val, 4)
+        v.add_var("-b", -2)
+        val = file_parse.var_val("-b", v)
+        self.assertEqual(val, -2)
+        v.add_var("x5", 1)
+        val = file_parse.var_val("x5", v)
+        self.assertEqual(val, 1)
+        d = "1"
+        val = file_parse.var_val(d, v)
+        self.assertEqual(val, float(d))
+        d = "-1"
+        val = file_parse.var_val(d, v)
+        self.assertEqual(val, float(d))
+        d = "-0.0"
+        val = file_parse.var_val(d, v)
+        self.assertEqual(val, float(d))
+        d = ".11111"
+        val = file_parse.var_val(d, v)
+        self.assertEqual(val, float(d))
+        d = "100e10"
+        val = file_parse.var_val(d, v)
+        self.assertEqual(val, float(d))
+
 
 class TestObject(unittest.TestCase):
     def test_make_position_matrix(self):

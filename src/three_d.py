@@ -18,7 +18,6 @@ def transform_vertex(point: vertex.Vertex, draw_data: utils.SceneData, objs: Dic
         draw_data (utils.DrawData): Data needed to draw the image
     """
     copy_point = copy.deepcopy(point)
-    # Apply the model view transformations
     if objs[draw_data.curent_object].position_matrix is None:
         objs[draw_data.curent_object].make_position_matrix(objs)
     eye_coordinates: np.ndarray = np.matmul(objs[draw_data.curent_object].position_matrix, copy_point.position_data())

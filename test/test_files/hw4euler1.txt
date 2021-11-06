@@ -1,0 +1,188 @@
+pngs 180 120 hw4euler1- 36
+fps 12
+mul deg f 10
+mul deg2 deg 0.5
+mul deg3 deg2 0.5
+
+# Set a 3-by-2 aspect ratio, 90Â° field-of-view in Y, near plane at 0.1, far plane at 10
+loadp 0.6666666666666 0 0 0  0 1 0 0  0 0 -1.02020202020202 -0.20202020202020202  0 0 -1 0
+
+object xyz world
+euler xyz deg deg2 deg3
+position -3 -1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
+
+object yzx world
+euler yzx deg deg2 deg3
+position 0 -1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
+
+object zxy world
+euler zxy deg deg2 deg3
+position 3 -1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
+
+object zyx world
+euler zyx deg deg2 deg3
+position -3 1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
+
+object yxz world
+euler yxz deg deg2 deg3
+position 0 1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
+
+object xzy world
+euler xzy deg deg2 deg3
+position 3 1.5 -5
+xyz -1 -1 -1
+xyz -1 -1  1
+xyz -1  1 -1
+xyz -1  1  1
+xyz  1 -1 -1
+xyz  1 -1  1
+xyz  1  1 -1
+xyz  1  1  1
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8
