@@ -1,6 +1,6 @@
 import dataclasses
 import math
-from typing import Any
+from typing import Any, Optional
 
 from PIL import Image
 import numpy as np
@@ -66,6 +66,7 @@ class SceneData():
     color: RGBFloat = RGBFloat(1.0, 1.0, 1.0)
     near = 0
     far = 1
+    curent_object: Optional[str] = None
     depth_buffer: np.ndarray = dataclasses.field(init=False)
     def __post_init__(self):
         self.depth_buffer = np.ones((self.height, self.width))
@@ -147,12 +148,12 @@ def parse_args(args: list) -> CmdLineArgs:
 def make_filename_list(image_info: ImageInfo) -> "list[str]":
     # List of names for image files
     names_list = []
-    if image_info.is_single_file:
-        names_list.append(image_info.filename)
-    else:
-        for i in range(image_info.number_of_images):
-            name = image_info.filename + f"{i:03d}" + ".png"
-            names_list.append(name)
+    # if image_info.is_single_file:
+    #     names_list.append(image_info.filename)
+    # else:
+    for i in range(image_info.number_of_images):
+        name = image_info.filename + f"{i:03d}" + ".png"
+        names_list.append(name)
     return names_list
 
 
@@ -183,11 +184,66 @@ class Quaternion():
 
     def __array__(self, dtype=None):
         return np.asarray([self.w, self.x, self.y, self.z])
+    
+    def make_rotation(self) -> np.ndarray:
+        n = self.w**2 + self.x**2 + self.y**2 + self.z**2
+        s = 0 if n == 0 else 2/n
+        row_0 = [
+            1-s*(self.y**2 + self.z**2),
+            s*(self.x*self.y - self.z*self.w),
+            s*(self.x*self.z + self.y*self.w),
+            0
+        ]
+        row_1 = [
+            s*(self.x*self.y + self.z*self.w),
+            1-s*(self.x**2 + self.z**2),
+            s*(self.y*self.z - self.x*self.w),
+            0
+        ]
+        row_2 = [
+            s*(self.x*self.z - self.y*self.w),
+            s*(self.y*self.z + self.x*self.w),
+            1-s*(self.x**2 + self.y**2),
+            0
+        ]
+        row_3 = [0,0,0,1]
+        return np.asarray([row_0, row_1, row_2, row_3])
 
 @dataclasses.dataclass
 class Euler():
-    x: float = 0
-    y: float = 0
-    z: float = 0
+    # rotation matrix code from https://www.meccanismocomplesso.org/en/3d-rotations-and-euler-angles-in-python/
+    order: str = "xyz"
+    first: float = 0
+    second: float = 0
+    third: float = 0
+
     def __array__(self, dtype=None):
         return np.asarray([self.x, self.y, self.z])
+    
+    def make_rotation(self) -> np.ndarray:
+        rot = np.identity(4)
+        for i, val in enumerate([self.first, self.second, self.third]):
+            if self.order[i] == "x":
+                rot = np.matmul(rot, self._rot_x(val))
+            elif self.order[i] == "y":
+                rot = np.matmul(rot, self._rot_y(val))
+            elif self.order[i] == "z":
+                rot = np.matmul(rot, self._rot_z(val))
+        return rot
+    def _rot_x(self,theta):
+        return np.asarray([[ 1, 0              , 0              , 0],
+                           [ 0, math.cos(theta),-math.sin(theta), 0],
+                           [ 0, math.sin(theta), math.cos(theta), 0],
+                           [ 0, 0              ,0               , 1]])
+        
+    def _rot_y(self,theta):
+        return np.asarray([[ math.cos(theta), 0, math.sin(theta), 0],
+                           [ 0              , 1, 0              , 0],
+                           [-math.sin(theta), 0, math.cos(theta), 0],
+                           [ 0              , 0, 0              , 1]])
+        
+    def _rot_z(self,theta):
+        return np.asarray([[ math.cos(theta), -math.sin(theta), 0, 0 ],
+                           [ math.sin(theta), math.cos(theta) , 0, 0 ],
+                           [ 0              , 0               , 1, 0 ],
+                           [ 0              , 0               , 0, 1 ]])

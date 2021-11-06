@@ -2,13 +2,14 @@ import copy
 
 import numpy as np
 from PIL import Image
-
+from typing import Dict
 import src.lines as lines
+from src.objects import Object
 import src.utils as utils
 import src.vertex as vertex
 
 
-def transform_vertex(point: vertex.Vertex, draw_data: utils.SceneData) -> vertex.Vertex:
+def transform_vertex(point: vertex.Vertex, draw_data: utils.SceneData, objs: Dict[str, Object]) -> vertex.Vertex:
     """Ideas for this were taken from http://www.songho.ca/opengl/gl_transform.html
 
     Args:
@@ -18,7 +19,9 @@ def transform_vertex(point: vertex.Vertex, draw_data: utils.SceneData) -> vertex
     """
     copy_point = copy.deepcopy(point)
     # Apply the model view transformations
-    eye_coordinates: np.ndarray = np.matmul(draw_data.model_view, copy_point.position_data())
+    if objs[draw_data.curent_object].position_matrix is None:
+        objs[draw_data.curent_object].make_position_matrix(objs)
+    eye_coordinates: np.ndarray = np.matmul(objs[draw_data.curent_object].position_matrix, copy_point.position_data())
     # Apply the projection matrix
     clip_coordinates = np.matmul(draw_data.projection, eye_coordinates)
     # divide each x, y, and z by w
@@ -31,11 +34,11 @@ def transform_vertex(point: vertex.Vertex, draw_data: utils.SceneData) -> vertex
     copy_point.y = (copy_point.y + 1) * draw_data.height/2
     return copy_point
 
-def draw_3d_triangle(image: Image, draw_data: utils.SceneData, i1: vertex.Vertex, i2: vertex.Vertex, i3: vertex.Vertex, gouraud: bool = False):
+def draw_3d_triangle(image: Image, draw_data: utils.SceneData, objs: Dict[str, Object], i1: vertex.Vertex, i2: vertex.Vertex, i3: vertex.Vertex, gouraud: bool = False):
     # First, transform the vertexes provided
-    p1 = transform_vertex(i1, draw_data)
-    p2 = transform_vertex(i2, draw_data)
-    p3 = transform_vertex(i3, draw_data)
+    p1 = transform_vertex(i1, draw_data, objs)
+    p2 = transform_vertex(i2, draw_data, objs)
+    p3 = transform_vertex(i3, draw_data, objs)
 
     # Rasterize the triangle into fragments, interpolating a z value 
     # (and other values as extras require) for each pixel. 

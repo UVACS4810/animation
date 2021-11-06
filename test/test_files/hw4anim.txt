@@ -1,0 +1,52 @@
+pngs 180 120 hw4anim- 50
+
+# informative only: I'll show the animation preview at this FPS
+fps 8
+
+# sets t to be in [0,1)
+div t f l
+
+# angle from 0 to 360, with cos and sin of it
+mul angle t 360
+cos x angle
+sin y angle
+
+# double oscillation speed by squaring
+pow x2 x 2
+
+# t2 = backwards t
+mul tmp1 t -1
+add t2 tmp1 1
+
+# Set a 3-by-2 aspect ratio, 90Â° field-of-view in Y, near plane at 0.1, far plane at 10
+loadp 0.6666666666666 0 0 0  0 1 0 0  0 0 -1.02020202020202 -0.20202020202020202  0 0 -1 0
+
+object box world
+quaternion 1 t t2 x2
+position x y -5
+xyz -2 -2 -2
+xyz -2 -2  2
+xyz -2  2 -2
+xyz -2  2  2
+xyz  2 -2 -2
+xyz  2 -2  2
+xyz  2  2 -2
+xyz  2  2  2
+color 0 0.5 0.5
+trif 1 2 3
+trif 2 3 4
+color 1 0.5 0.5
+trif 5 6 7
+trif 6 7 8
+color 0.5 0 0.5
+trif 1 2 5
+trif 2 5 6
+color 0.5 1 0.5
+trif 3 4 7
+trif 4 7 8
+color 0.5 0.5 0
+trif 1 3 5
+trif 3 5 7
+color 0.5 0.5 1
+trif 2 4 6
+trif 4 6 8

@@ -1,3 +1,4 @@
+from math import pi
 import unittest
 
 import numpy as np
@@ -131,6 +132,17 @@ class TestUtils(unittest.TestCase):
     def test_quaternion(self):
         q = utils.Quaternion()
         self.assertTrue(np.array_equal(np.asarray(q), np.asarray([1,0,0,0])))
+        expected_rot_mat = np.identity(4)
+        self.assertTrue(np.array_equal(expected_rot_mat, q.make_rotation()))
+        # rotation matrix values came from https://www.andre-gaschler.com/rotationconverter/
+        q2 = utils.Quaternion(1, 1, 0, 0)
+        expected_rot_mat = np.asarray([[1,0,0,0],[0,0,-1,0],[0,1,0,0],[0,0,0,1]])
+        self.assertTrue(np.array_equiv(expected_rot_mat, q2.make_rotation()))
+
+    def test_euler(self):
+        e = utils.Euler("xyz", pi/2, -pi/2, pi/2)
+        exp_rot_mat = np.asarray([[0,0,-1,0], [0,1,0,0], [1,0,0,0],[0,0,0,1]])
+        self.assertTrue(np.array_equiv(exp_rot_mat, np.round(e.make_rotation(), 10)))
 
 class TestLines(unittest.TestCase):
     def test_dda(self):
@@ -263,6 +275,30 @@ class TestFileParse(unittest.TestCase):
 
 class TestObject(unittest.TestCase):
     def test_make_position_matrix(self):
+        objects = {}
         o = obj.Object()
-        o.make_position_matrix()
+        objects["one"] = o
+        self.assertFalse(o.position_matrix)
+        o.make_position_matrix(objects)
+        self.assertTrue(o.position_matrix.any())
+        expected = np.identity(4)
+        self.assertTrue(np.array_equiv(o.position_matrix, expected))
+
+        o2 = obj.Object("one")
+        objects["two"] = o2
+        o2.origin = utils.Vec3(1,2,3)
+        o2.scale = utils.Vec3(3,2,1)
+        o2.make_position_matrix(objects)
+        expected = np.asarray([[3,0,0,-2],[0,2,0,-2],[0,0,1,0],[0,0,0,1]])
+        self.assertTrue(np.array_equiv(o2.position_matrix, expected))
+    
+    def test_transform_vertex(self):
+        objects = {}
+        o = obj.Object()
+        objects["one"] = o
+        o.position = utils.Vec3(1,2,3)
+        vert_to_transform = vertex.Vertex(0,0,0)
+        expected_after_transform = vertex.Vertex(1,2,3)
+        real_after_transform = o.transform_vertex(vert_to_transform, objects)
+        self.assertEqual(expected_after_transform, real_after_transform)
         

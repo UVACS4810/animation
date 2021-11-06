@@ -1,5 +1,6 @@
 
 import math
+from typing import Dict
 
 import numpy as np
 from PIL import Image
@@ -8,6 +9,7 @@ import src.three_d as three_d
 import src.utils as utils
 from src.variables import Variables
 import src.vertex as vertex
+import src.objects as obj
 
 
 def get_image_info(line: str) -> utils.ImageInfo:
@@ -32,22 +34,25 @@ def get_image_info(line: str) -> utils.ImageInfo:
 
     return image_info
 
-def get_vertex_by_index(verts, index: str) -> vertex.Vertex:
+def get_vert(verts, index: str) -> vertex.Vertex:
     if (index.strip("-")).isnumeric():
         index = int(index)
     else:
         raise Exception("The index of a vertex must be a number", index)
     # if its a negative index just use that idex
+    vert = None
     if index < 0:
-        return verts[index]
-    return verts[index - 1]
+        vert = verts[index]
+    else:
+        vert = verts[index - 1]
+    return vert
 
 def var_val(var: str, variables: Variables) -> float:
-    if var.isdigit():
+    if var.strip("-").isdecimal():
         return float(var)
     return variables.get_var(var)
 
-def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, variables: Variables) -> None:
+def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, variables: Variables, objects: Dict[str, obj.Object]) -> None:
     """
     parse keywords:
     """
@@ -78,18 +83,46 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
     ### DRAWING TRIANGLES ###
     elif keyword == "trif":
         i1, i2, i3 = line[1:4]
-        p1 = get_vertex_by_index(draw_data.vertex_list, i1)
-        p2 = get_vertex_by_index(draw_data.vertex_list, i2)
-        p3 = get_vertex_by_index(draw_data.vertex_list, i3)
-        three_d.draw_3d_triangle(image, draw_data, p1, p2, p3)
+        p1 = get_vert(draw_data.vertex_list, i1)
+        p2 = get_vert(draw_data.vertex_list, i2)
+        p3 = get_vert(draw_data.vertex_list, i3)
+        three_d.draw_3d_triangle(image, draw_data, objects, p1, p2, p3)
     
     elif keyword == "trig":
         i1, i2, i3 = line[1:4]
-        p1 = get_vertex_by_index(draw_data.vertex_list, i1)
-        p2 = get_vertex_by_index(draw_data.vertex_list, i2)
-        p3 = get_vertex_by_index(draw_data.vertex_list, i3)
-        three_d.draw_3d_triangle(image, draw_data, p1, p2, p3, gouraud=True)
+        p1 = get_vert(draw_data.vertex_list, i1)
+        p2 = get_vert(draw_data.vertex_list, i2)
+        p3 = get_vert(draw_data.vertex_list, i3)
+        three_d.draw_3d_triangle(image, draw_data, objects, p1, p2, p3, gouraud=True)
     
+    elif keyword == "object":
+        if len(line) != 3:
+            raise Exception("Object call expects 2 keywords, name and parent")
+        name, parent = line[1:3]
+
+        objects[name] = obj.Object(parent)
+        # reset the vertex_list
+        draw_data.vertex_list.clear()
+        # set the current_object
+        draw_data.curent_object = name
+
+    elif keyword == "position":
+        x = var_val(line[1], variables)
+        y = var_val(line[2], variables)
+        z = var_val(line[3], variables)
+        position = utils.Vec3(x, y, z)
+        objects[draw_data.curent_object].position = position
+    elif keyword == "quaternion":
+        w = var_val(line[1], variables)
+        x = var_val(line[2], variables)
+        y = var_val(line[3], variables)
+        z = var_val(line[4], variables)
+        quat = utils.Quaternion(w, x, y, z)
+        objects[draw_data.curent_object].orient = quat
+    
+
+
+
     elif keyword == "add":
         dest, a, b = line[1:4]
         a_val = var_val(a, variables)
@@ -125,4 +158,4 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.SceneData, vari
         variables.add_var(dest, math.cos(math.radians(a_val)))
     elif keyword == "object":
         name, parent = line[1:3]
-        
+
