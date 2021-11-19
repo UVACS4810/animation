@@ -1,3 +1,4 @@
+#!/bin/zsh
 # Usage: oneDiff refrence.png student.png diffimgname.png
 # Result: diffimgname.png
 function oneDiff {
@@ -27,7 +28,6 @@ function makeDiffAnimation {
     base=.
     if [ "$#" -gt 1 ]; then base="$2"; fi
     name=$(basename "$1" .png)
-    
     extractFrames "$1" tmp
     for f in tmp-???.png
     do
